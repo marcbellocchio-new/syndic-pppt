@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, -apple-system, sans-serif; font-size: 13px; background: #f0f2f5; color: #1a1a1a; padding: 16px; }
+
+h1 { font-size: 15px; font-weight: 700; color: #1e3a5f; margin-bottom: 4px; }
+.subtitle { font-size: 11px; color: #666; margin-bottom: 16px; }
+
+/* PHASE BLOCKS */
+.phase { margin-bottom: 14px; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+.phase-header { padding: 9px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+.phase-header:hover { filter: brightness(.95); }
+.phase-num { width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,.25); color: #fff; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.phase-title { flex: 1; color: #fff; font-weight: 700; font-size: 13px; }
+.phase-tag { font-size: 10px; background: rgba(255,255,255,.2); color: #fff; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+.phase-toggle { color: rgba(255,255,255,.7); font-size: 16px; transition: transform .2s; }
+.phase-toggle.open { transform: rotate(180deg); }
+
+.phase-body { background: #fff; padding: 12px 14px; border-top: 1px solid rgba(0,0,0,.06); }
+
+/* COLORS */
+.ph1 .phase-header { background: #1e40af; }
+.ph2 .phase-header { background: #0f766e; }
+.ph3 .phase-header { background: #7c3aed; }
+.ph4 .phase-header { background: #b45309; }
+.ph5 .phase-header { background: #166534; }
+.ph6 .phase-header { background: #9f1239; }
+.ph7 .phase-header { background: #374151; }
+
+/* STEPS */
+.step { display: flex; gap: 10px; margin-bottom: 10px; }
+.step:last-child { margin-bottom: 0; }
+.step-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+.step-content { flex: 1; }
+.step-content strong { font-size: 12px; display: block; margin-bottom: 2px; }
+.step-content p { font-size: 11px; color: #444; line-height: 1.5; }
+
+/* VOTE BOX */
+.vote-box { border-radius: 6px; padding: 8px 10px; margin-top: 8px; font-size: 11px; line-height: 1.6; }
+.vote-art24  { background: #fce7f3; border-left: 3px solid #9d174d; }
+.vote-art25  { background: #ffedd5; border-left: 3px solid #9a3412; }
+.vote-art25i { background: #ede9fe; border-left: 3px solid #5b21b6; }
+.vote-auto   { background: #dcfce7; border-left: 3px solid #166534; }
+.vote-warn   { background: #fef3c7; border-left: 3px solid #d97706; }
+.vote-block  { background: #fee2e2; border-left: 3px solid #dc2626; }
+
+.vote-label { font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: .4px; display: block; margin-bottom: 3px; }
+.vote-art24 .vote-label  { color: #9d174d; }
+.vote-art25 .vote-label  { color: #9a3412; }
+.vote-art25i .vote-label { color: #5b21b6; }
+.vote-auto .vote-label   { color: #166534; }
+.vote-warn .vote-label   { color: #92400e; }
+.vote-block .vote-label  { color: #dc2626; }
+
+/* OUTCOME */
+.outcome { display: flex; gap: 8px; margin-top: 8px; }
+.out { flex: 1; border-radius: 6px; padding: 7px 9px; font-size: 11px; line-height: 1.5; }
+.out-yes { background: #dcfce7; border: 1px solid #86efac; }
+.out-no  { background: #fee2e2; border: 1px solid #fca5a5; }
+.out strong { font-size: 11px; display: block; margin-bottom: 2px; }
+
+/* CONNECTOR */
+.connector { text-align: center; margin: -6px 0 8px; font-size: 20px; color: #94a3b8; }
+
+/* LEGEND */
+.legend { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.leg-item { font-size: 10px; padding: 3px 8px; border-radius: 10px; font-weight: 600; }
+.leg-24  { background: #fce7f3; color: #9d174d; }
+.leg-25  { background: #ffedd5; color: #9a3412; }
+.leg-25i { background: #ede9fe; color: #5b21b6; }
+.leg-ok  { background: #dcfce7; color: #166534; }
+.leg-ko  { background: #fee2e2; color: #dc2626; }
+.leg-w   { background: #fef3c7; color: #92400e; }
+
+.ref { font-size: 10px; color: #94a3b8; margin-top: 6px; font-style: italic; }
+a { color: #1a56db; text-decoration: none; font-size: 10px; }
+a:hover { text-decoration: underline; }
+
+.divider { border: none; border-top: 2px dashed #e2e8f0; margin: 14px 0 10px; }
+.section-label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<h1>🏗️ PPPT → PPT : Toutes les étapes et votes en AG</h1>
+<p class="subtitle">Loi n°65-557 du 10/07/1965 art. 14-2 et 14-2-1 • Loi Climat & Résilience n°2021-1104 art. 171 • Maj. 2026</p>
+
+<div class="legend">
+  <span class="leg-item leg-24">Art. 24 — Majorité simple (présents + représentés)</span>
+  <span class="leg-item leg-25">Art. 25 — Majorité absolue (tous copropriétaires)</span>
+  <span class="leg-item leg-25i">Art. 25-1 — 2ᵉ vote (si ≥ 1/3 des voix)</span>
+  <span class="leg-item leg-ok">✅ Syndic seul / sans vote</span>
+  <span class="leg-item leg-ko">❌ Blocage / conséquence</span>
+  <span class="leg-item leg-w">⚠️ Point critique</span>
+</div>
+
+<!-- ══════════════════════════════════════════════ PARTIE 1 : PPPT -->
+<p class="section-label">── Partie 1 : Élaboration du PPPT (diagnostic)</p>
+
+<!-- PHASE 1 -->
+<div class="phase ph1" id="ph1">
+  <div class="phase-header" onclick="toggle('ph1')">
+    <div class="phase-num">1</div>
+    <div class="phase-title">Obligation légale & déclenchement</div>
+    <div class="phase-tag">Syndic — sans vote</div>
+    <div class="phase-toggle" id="tog-ph1">▼</div>
+  </div>
+  <div class="phase-body" id="body-ph1">
+    <div class="step">
+      <div class="step-icon" style="background:#dbeafe">📋</div>
+      <div class="step-content">
+        <strong>Vérifier si la copropriété est concernée</strong>
+        <p>Immeuble à destination totale ou partielle d'habitation + réception des travaux de construction > 15 ans. Si OUI → obligation légale depuis 01/01/2025 (toutes tailles). Exception : DTG existant ne révélant aucun besoin de travaux sur 10 ans → dispense totale.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon" style="background:#dbeafe">⚖️</div>
+      <div class="step-content">
+        <strong>Obligation du syndic d'inscrire à l'OJ</strong>
+        <p>Le syndic <strong>doit</strong> inscrire à l'ordre du jour de l'AG la résolution portant sur les modalités d'élaboration du PPPT (choix prestataire, budget). C'est une obligation légale directe. Refus d'inscription = faute professionnelle engageant sa responsabilité.</p>
+        <div class="vote-auto"><span class="vote-label">✅ Syndic seul — obligation sans vote préalable</span>Inscription à l'OJ est un acte du syndic, pas une décision de l'AG.</div>
+      </div>
+    </div>
+    <p class="ref">Réf. : Loi n°65-557 art. 14-2 I — <a href="https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000043977289" target="_blank">Légifrance art. 14-2</a></p>
+  </div>
+</div>
+
+<div class="connector">↓</div>
+
+<!-- PHASE 2 -->
+<div class="phase ph2" id="ph2">
+  <div class="phase-header" onclick="toggle('ph2')">
+    <div class="phase-num">2</div>
+    <div class="phase-title">Vote AG sur les modalités d'élaboration du PPPT</div>
+    <div class="phase-tag">Art. 24 — Majorité simple</div>
+    <div class="phase-toggle" id="tog-ph2">▼</div>
+  </div>
+  <div class="phase-body" id="body-ph2">
+    <div class="step">
+      <div class="step-icon" style="background:#d1fae5">🗳️</div>
+      <div class="step-content">
+        <strong>Résolution soumise au vote</strong>
+        <p>L'AG vote sur : (1) le lancement de la mission PPPT, (2) le choix du prestataire (bureau d'études, thermicien, architecte ou AMO certifié — Décret n°2022-663), (3) le budget alloué. Le syndic doit présenter au minimum 2-3 devis comparatifs.</p>
+        <div class="vote-art24"><span class="vote-label">🔴 Art. 24 — Majorité simple</span>Majorité des voix exprimées des copropriétaires présents, représentés ou ayant voté par correspondance. Les abstentionnistes ne comptent pas.</div>
+      </div>
+    </div>
+    <div class="outcome">
+      <div class="out out-yes">
+        <strong>✅ Vote favorable</strong>
+        Le syndic mandate le prestataire. Mission lancée → Phase 3.
+      </div>
+      <div class="out out-no">
+        <strong>❌ Vote défavorable</strong>
+        Aucune sanction pénale immédiate. Mais le syndic <strong>doit obligatoirement réinscrire</strong> la résolution à chaque AG annuelle suivante tant qu'elle n'est pas votée. Risque : blocage de vente (aucun PPPT à annexer au compromis).
+      </div>
+    </div>
+    <div class="vote-warn" style="margin-top:8px"><span class="vote-label">⚠️ Point critique vente</span>En cas de refus répété, le PV de vote négatif est fourni au notaire comme pièce de substitution. L'acquéreur est informé — peut négocier le prix ou refuser le financement.</div>
+    <p class="ref">Réf. : Loi n°65-557 art. 14-2 I al. 4 ; <a href="https://www.informationsrapidesdelacopropriete.fr/veille-juridique/7232-copropriete-a-chaque-copropriete-son-pppt" target="_blank">IRC mars 2025</a></p>
+  </div>
+</div>
+
+<div class="connector">↓</div>
+
+<!-- PHASE 3 -->
+<div class="phase ph3" id="ph3">
+  <div class="phase-header" onclick="toggle('ph3')">
+    <div class="phase-num">3</div>
+    <div class="phase-title">Réalisation du PPPT par le prestataire</div>
+    <div class="phase-tag">Hors AG — exécution technique</div>
+    <div class="phase-toggle" id="tog-ph3">▼</div>
+  </div>
+  <div class="phase-body" id="body-ph3">
+    <div class="step">
+      <div class="step-icon" style="background:#ede9fe">🔬</div>
+      <div class="step-content">
+        <strong>Contenu obligatoire du PPPT</strong>
+        <p>Analyse du bâti et des équipements + DPE collectif (ou données DPE existant) + liste des travaux nécessaires à la sauvegarde, santé/sécurité, économies d'énergie et réduction GES + échéancier sur 10 ans + estimation sommaire des coûts par poste. Le prestataire doit être indépendant et assuré (Décret n°2022-663 du 25/04/2022).</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon" style="background:#ede9fe">⏱️</div>
+      <div class="step-content">
+        <strong>Délai de réalisation</strong>
+        <p>En pratique : 6 à 12 semaines selon taille de la copropriété. Aucun délai légal fixé, mais le syndic doit présenter le PPPT à la <strong>1ère AG annuelle</strong> suivant son élaboration.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon" style="background:#ede9fe">📅</div>
+      <div class="step-content">
+        <strong>Validité et actualisation</strong>
+        <p>Le PPPT doit être actualisé tous les <strong>10 ans</strong>. Si le PPPT conclut à <strong>zéro travaux nécessaires sur 10 ans</strong> → la copropriété est dispensée d'adopter un PPT (mais PPPT reste à fournir lors des ventes).</p>
+      </div>
+    </div>
+    <p class="ref">Réf. : Loi n°65-557 art. 14-2 I ; Décret n°2022-663 du 25/04/2022</p>
+  </div>
+</div>
+
+<hr class="divider">
+<p class="section-label">── Partie 2 : Présentation et adoption du PPT (plan de travaux)</p>
+
+<!-- PHASE 4 -->
+<div class="phase ph4" id="ph4">
+  <div class="phase-header" onclick="toggle('ph4')">
+    <div class="phase-num">4</div>
+    <div class="phase-title">Présentation du PPPT en AG + vote d'adoption du PPT</div>
+    <div class="phase-tag">Art. 25 — Majorité absolue</div>
+    <div class="phase-toggle" id="tog-ph4">▼</div>
+  </div>
+  <div class="phase-body" id="body-ph4">
+    <div class="step">
+      <div class="step-icon" style="background:#ffedd5">📊</div>
+      <div class="step-content">
+        <strong>Présentation obligatoire à la 1ère AG suivant l'élaboration</strong>
+        <p>Le syndic inscrit deux résolutions distinctes à l'OJ : (1) présentation du PPPT, (2) si le PPPT fait apparaître des travaux sur 10 ans → vote sur l'adoption de tout ou partie du PPT.</p>
+        <div class="vote-art25"><span class="vote-label">🟠 Art. 25 — Majorité absolue</span>Majorité des voix de <strong>tous</strong> les copropriétaires (présents + représentés + absents non représentés). Seuil le plus élevé du droit commun copropriété.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon" style="background:#ffedd5">🔄</div>
+      <div class="step-content">
+        <strong>Mécanisme Art. 25-1 — 2ème vote immédiat possible</strong>
+        <p>Si le vote art. 25 échoue mais que la résolution recueille <strong>au moins 1/3 des voix de tous les copropriétaires</strong>, un 2ème vote peut être organisé immédiatement lors de la même AG à la majorité simple (art. 24).</p>
+        <div class="vote-art25i"><span class="vote-label">🟣 Art. 25-1 — 2ᵉ vote (si ≥ 1/3 des voix)</span>Majorité simple des présents + représentés. Évite de devoir reconvoquer une AG.</div>
+      </div>
+    </div>
+    <div class="outcome">
+      <div class="out out-yes">
+        <strong>✅ PPT adopté (tout ou partie)</strong>
+        Le PPT devient contraignant → Phase 5. Le syndic intègre les travaux au carnet d'entretien. Fonds travaux rebasé à ≥ 2,5% du montant PPT.
+      </div>
+      <div class="out out-no">
+        <strong>❌ PPT refusé</strong>
+        Le PPPT reste le document de référence (fourni lors des ventes). Syndic réinscrit obligatoirement le vote à chaque AG suivante. Fonds travaux reste à ≥ 5% du budget prévisionnel.
+      </div>
+    </div>
+    <p class="ref">Réf. : Loi n°65-557 art. 14-2 II ; art. 25 et 25-1 — <a href="https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000043977289" target="_blank">Légifrance art. 14-2</a></p>
+  </div>
+</div>
+
+<div class="connector">↓ (si PPT adopté)</div>
+
+<!-- PHASE 5 -->
+<div class="phase ph5" id="ph5">
+  <div class="phase-header" onclick="toggle('ph5')">
+    <div class="phase-num">5</div>
+    <div class="phase-title">Conséquences immédiates de l'adoption du PPT</div>
+    <div class="phase-tag">Obligations post-vote</div>
+    <div class="phase-toggle" id="tog-ph5">▼</div>
+  </div>
+  <div class="phase-body" id="body-ph5">
+    <div class="step">
+      <div class="step-icon" style="background:#dcfce7">💶</div>
+      <div class="step-content">
+        <strong>Rebasage obligatoire du fonds de travaux</strong>
+        <p>La cotisation annuelle obligatoire au fonds de travaux ne peut être inférieure à <strong>2,5% du montant total des travaux prévus dans le PPT adopté</strong> ET à <strong>5% du budget prévisionnel annuel</strong>. Le double seuil s'applique, c'est le plus élevé des deux qui prévaut en pratique.</p>
+        <div class="vote-art25"><span class="vote-label">🟠 Art. 25 — Vote si montant supérieur souhaité</span>L'AG peut décider d'un montant supérieur aux planchers légaux, à la majorité absolue (art. 14-2-1).</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon" style="background:#dcfce7">📒</div>
+      <div class="step-content">
+        <strong>Intégration au carnet d'entretien</strong>
+        <p>Les travaux prescrits + leur échéancier sont intégrés au carnet d'entretien de l'immeuble. Acte du syndic, sans vote.</p>
+        <div class="vote-auto"><span class="vote-label">✅ Syndic seul</span>Obligation légale directe post-adoption.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon" style="background:#dcfce7">🔔</div>
+      <div class="step-content">
+        <strong>Contrôle administratif possible à tout moment</strong>
+        <p>Le maire, le préfet ou le président d'EPCI peut demander communication du PPT adopté pour vérifier que les travaux garantissent la sécurité des occupants. Si non transmis dans <strong>1 mois</strong> ou si insuffisant → élaboration d'office aux frais du syndicat.</p>
+      </div>
+    </div>
+    <p class="ref">Réf. : Loi n°65-557 art. 14-2 II et III ; art. 14-2-1 — <a href="https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000043967792" target="_blank">Légifrance art. 14-2-1</a></p>
+  </div>
+</div>
+
+<div class="connector">↓</div>
+
+<!-- PHASE 6 -->
+<div class="phase ph6" id="ph6">
+  <div class="phase-header" onclick="toggle('ph6')">
+    <div class="phase-num">6</div>
+    <div class="phase-title">Vote d'exécution de chaque tranche de travaux</div>
+    <div class="phase-tag">Art. 25 par tranche — vote distinct</div>
+    <div class="phase-toggle" id="tog-ph6">▼</div>
+  </div>
+  <div class="phase-body" id="body-ph6">
+    <div class="step">
+      <div class="step-icon" style="background:#ffe4e6">🔨</div>
+      <div class="step-content">
+        <strong>Chaque tranche de travaux = vote distinct en AG</strong>
+        <p>L'adoption du PPT ne vaut pas autorisation d'exécuter les travaux. Chaque lot de travaux prévu dans le PPT doit faire l'objet d'une résolution spécifique inscrite à l'OJ, avec devis + descriptif technique.</p>
+        <div class="vote-art25"><span class="vote-label">🟠 Art. 25 — Majorité absolue (règle générale)</span>Travaux sur parties communes → art. 25 b. Mécanisme art. 25-1 applicable si ≥ 1/3 des voix.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon" style="background:#ffe4e6">💰</div>
+      <div class="step-content">
+        <strong>Financement simultané</strong>
+        <p>Lors du même vote, l'AG décide de l'affectation du fonds de travaux + d'éventuels appels de fonds complémentaires. Les copropriétaires peuvent demander un étalement du paiement sur 10 ans (peu utilisé en pratique).</p>
+      </div>
+    </div>
+    <div class="outcome">
+      <div class="out out-yes">
+        <strong>✅ Travaux votés</strong>
+        Syndic lance les appels d'offres, signe les marchés. Travaux réalisés selon échéancier PPT.
+      </div>
+      <div class="out out-no">
+        <strong>❌ Travaux refusés</strong>
+        Aucune sanction directe. Syndic réinscrit selon échéancier PPT. Si urgence sécurité → syndic peut agir seul (art. 18 al. 3).
+      </div>
+    </div>
+    <p class="ref">Réf. : Loi n°65-557 art. 25 b ; art. 14-2 III ; art. 18 al. 3</p>
+  </div>
+</div>
+
+<hr class="divider">
+<p class="section-label">── Partie 3 : Cycle d'actualisation</p>
+
+<!-- PHASE 7 -->
+<div class="phase ph7" id="ph7">
+  <div class="phase-header" onclick="toggle('ph7')">
+    <div class="phase-num">7</div>
+    <div class="phase-title">Actualisation décennale du PPPT et du PPT</div>
+    <div class="phase-tag">Tous les 10 ans</div>
+    <div class="phase-toggle" id="tog-ph7">▼</div>
+  </div>
+  <div class="phase-body" id="body-ph7">
+    <div class="step">
+      <div class="step-icon" style="background:#e5e7eb">🔁</div>
+      <div class="step-content">
+        <strong>PPPT actualisé tous les 10 ans — mêmes étapes phases 1 à 3</strong>
+        <p>Le syndic relance un PPPT actualisé. Vote AG art. 24 pour le prestataire. Nouveau PPPT présenté en AG. Si travaux identifiés → nouveau vote PPT à l'art. 25.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-icon" style="background:#e5e7eb">📝</div>
+      <div class="step-content">
+        <strong>Suspension du fonds de travaux possible</strong>
+        <p>L'AG peut voter la suspension des cotisations si le fonds dépasse le budget prévisionnel annuel, OU dépasse 50% du montant total du PPT adopté. Vote à l'art. 25 (majorité absolue).</p>
+        <div class="vote-art25"><span class="vote-label">🟠 Art. 25 — Majorité absolue pour suspension</span>Loi n°65-557 art. 14-2-1 II.</div>
+      </div>
+    </div>
+    <p class="ref">Réf. : Loi n°65-557 art. 14-2 I al. 2 ; art. 14-2-1 II — <a href="https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000043967792" target="_blank">Légifrance art. 14-2-1</a></p>
+  </div>
+</div>
+
+<script>
+function toggle(id) {
+  const body = document.getElementById('body-' + id);
+  const tog = document.getElementById('tog-' + id);
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  tog.textContent = isOpen ? '▶' : '▼';
+  tog.classList.toggle('open', !isOpen);
+}
+// All open by default — nothing to do
+</script>
+</body>
+</html>
